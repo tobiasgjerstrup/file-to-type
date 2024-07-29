@@ -1,0 +1,17 @@
+{
+  "name": "file-to-type",
+  "version": "1.0.0",
+  "description": "Read files and output the type",
+  "main": "src/main.js",
+  "scripts": {
+    "serve": "tsup src/main.ts --watch --onSuccess \"node dist/main.cjs\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.2.3",
+    "typescript": "^5.5.4"
+  },
+  "type": "module"
+}
