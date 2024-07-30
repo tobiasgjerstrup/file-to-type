@@ -1,6 +1,6 @@
 {
   "name": "file-to-type",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Read files and output the type",
   "main": "src/main.js",
   "scripts": {
@@ -13,5 +13,8 @@
     "tsup": "^8.2.3",
     "typescript": "^5.5.4"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
 }

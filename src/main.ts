@@ -1,4 +1,7 @@
 import fs from "fs/promises";
+import { api } from "./config.js";
+import axios from "axios";
+import { Agent } from "https";
 
 export class System {
     private types: { [key: string]: string } = {};
@@ -9,8 +12,13 @@ export class System {
     public async main() {
         await this.createInputAndOutputFiles();
 
-        const file = await fs.readFile("./input/input.json", "utf8");
-        this.data = JSON.parse(file);
+
+        if (api.url) {
+            this.data = await GET();
+        } else {
+            const file = await fs.readFile("./input/input.json", "utf8");
+            this.data = JSON.parse(file);
+        }
 
         this.objectLookup(this.data);
         fs.writeFile("./output/output.json", JSON.stringify(this.types, null, 2));
@@ -69,6 +77,23 @@ export class System {
             }
         }
     }
+}
+
+async function GET() {
+    console.log('getting data from url');
+    const data = (
+        await axios.get(api.url, {
+            auth: {
+                username: api.basicAuth.username,
+                password: api.basicAuth.password,
+            },
+            httpsAgent: new Agent({
+                rejectUnauthorized: false,
+            }),
+        })
+    ).data;
+    console.log('got data from url');
+    return data;
 }
 
 const system = new System();
