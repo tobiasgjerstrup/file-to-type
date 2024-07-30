@@ -1,56 +1,54 @@
 import fs from "fs/promises";
 
 export class System {
-  private types = {};
-  private data = {};
+    private types: { [key: string]: string } = {};
+    private data: object = {};
+    private stringSeperator = ".";
+    private arrayKeyName = "<ARRAY>";
 
-  public async main() {
-    const file = await fs.readFile("./input/input.json", "utf8");
-    this.data = JSON.parse(file);
+    public async main() {
+        const file = await fs.readFile("./input/input.json", "utf8");
+        this.data = JSON.parse(file);
 
-    this.types = this.objectLookup(this.data);
-
-    fs.writeFile("./output/output.json", JSON.stringify(this.types));
-
-    console.log(this.types);
-  }
-
-  private objectLookup(data: any) {
-    let object = {};
-    for (const key in data) {
-      if (typeof data[key] !== "object") {
-        object[key] = typeof data[key];
-      } /* else if (Array.isArray(data[key])) {
-      } */ else {
-        object[key] = this.objectLookup(data[key]);
-      }
+        this.objectLookup(this.data);
+        fs.writeFile("./output/output.json", JSON.stringify(this.types, null, 2));
     }
-    return object;
-  }
+
+    private objectLookup(data: object, keysString = "", isArray = false) {
+        for (const key in data) {
+            let keyFullName = keysString + key;
+            if (isArray) {
+                keyFullName = keysString + this.arrayKeyName;
+            }
+
+            if (typeof data[key] !== "object" || data[key] === null) {
+                if (isArray) {
+                    keyFullName = keysString + this.stringSeperator + this.arrayKeyName;
+                } else {
+                    keyFullName = keysString + this.stringSeperator + key;
+                }
+
+                let type: string = typeof data[key];
+
+                if (data[key] === null) {
+                    type = "null";
+                }
+
+                if (this.types[keyFullName] !== undefined) {
+                    if (!this.types[keyFullName].includes(type)) {
+                        this.types[keyFullName] += " | " + type;
+                    }
+                } else {
+                    this.types[keyFullName] = type;
+                }
+            } else if (Array.isArray(data[key])) {
+                this.objectLookup(data[key], keyFullName, true);
+            } else {
+                this.objectLookup(data[key], keyFullName);
+            }
+        }
+    }
 }
 
 const system = new System();
 system.main();
-
-/* {
-  "data": [
-    {
-      "name": 123,
-      "id": "123",
-      "types": {
-        "name": "another test",
-        "key": 2
-      }
-    },
-    {
-      "name": "123",
-      "id": "123",
-      "types": {
-        "name": "test",
-        "key": 1
-      }
-    }
-  ],
-  "count": 100
-}
- */
