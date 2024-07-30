@@ -7,11 +7,32 @@ export class System {
     private arrayKeyName = "<ARRAY>";
 
     public async main() {
+        await this.createInputAndOutputFiles();
+
         const file = await fs.readFile("./input/input.json", "utf8");
         this.data = JSON.parse(file);
 
         this.objectLookup(this.data);
         fs.writeFile("./output/output.json", JSON.stringify(this.types, null, 2));
+    }
+
+    private async createInputAndOutputFiles() {
+        try {
+            await fs.access("input");
+        } catch {
+            await fs.mkdir("input");
+        }
+        try {
+            await fs.access("input/input.json");
+        } catch {
+            await fs.writeFile("input/input.json", '{"input": "goes in this file"}');
+        }
+
+        try {
+            await fs.access("output");
+        } catch {
+            await fs.mkdir("output");
+        }
     }
 
     private objectLookup(data: object, keysString = "", isArray = false) {
